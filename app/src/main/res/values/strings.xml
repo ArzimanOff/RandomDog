@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RandomDog</string>
+    <string name="new_image_load_btn_text">Новая собака</string>
 </resources>
