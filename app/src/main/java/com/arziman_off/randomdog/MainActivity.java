@@ -2,8 +2,11 @@ package com.arziman_off.randomdog;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,24 +43,64 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         initViews();
 
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mainViewModel.generateDog();
-        mainViewModel.getDogImageMutableLiveData().observe(
-                this,
-                new Observer<DogImage>() {
-                    @Override
-                    public void onChanged(DogImage dogImage) {
-                        Glide
-                                .with(MainActivity.this)
-                                .load(dogImage.getMessage())
-                                .centerCrop()
-                                .into(mainImageView);
-                    }
-                });
+        mainViewModel.getDogImageMutableLiveData()
+                .observe(
+                        this,
+                        new Observer<DogImage>() {
+                            @Override
+                            public void onChanged(DogImage dogImage) {
+                                Glide
+                                        .with(MainActivity.this)
+                                        .load(dogImage.getMessage())
+                                        .centerCrop()
+                                        .into(mainImageView);
+                            }
+                        }
+                );
+        mainViewModel.getIsLoading()
+                .observe(
+                        this,
+                        new Observer<Boolean>() {
+                            @Override
+                            public void onChanged(Boolean isLoading) {
+                                if (isLoading) {
+                                    progressBar.setVisibility(View.VISIBLE);
+                                    mainImageView.setVisibility(View.GONE);
+                                } else {
+                                    mainImageView.setVisibility(View.VISIBLE);
+                                    progressBar.setVisibility(View.GONE);
+                                }
+                            }
+                        }
+                );
+        mainViewModel.getInternetError()
+                .observe(this,
+                        new Observer<Boolean>() {
+                            @Override
+                            public void onChanged(Boolean internetError) {
+                                if (internetError) {
+                                    Toast toast = Toast.makeText(
+                                            MainActivity.this,
+                                            R.string.internet_error_toast_text,
+                                            Toast.LENGTH_SHORT
+                                    );
+                                    toast.setGravity(Gravity.BOTTOM, 0, 250);
+                                    toast.show();
+                                }
+                            }
+                        }
+                );
+        btnNewImageLoad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainViewModel.generateDog();
+            }
+        });
     }
 
     private void initViews() {
@@ -65,5 +108,4 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.newImageLoader);
         btnNewImageLoad = findViewById(R.id.btnNewImageLoad);
     }
-
 }
