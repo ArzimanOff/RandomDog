@@ -1,5 +1,7 @@
 package com.arziman_off.randomdog;
 
+import androidx.annotation.NonNull;
+
 public class DogImage {
     private String message;
     private String status;
@@ -15,5 +17,14 @@ public class DogImage {
 
     public String getStatus() {
         return status;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "DogImage{" +
+                "message='" + message + '\'' +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

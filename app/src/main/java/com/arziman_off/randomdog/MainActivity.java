@@ -8,6 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -18,48 +22,22 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String BASED_URL = "https://dog.ceo/api/breeds/image/random";
+
+    private static final String LOG_TAG = "MainActivity";
+    private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-//            return insets;
-//        });
-        generateDog();
-    }
-
-    private void generateDog() {
-        new Thread(new Runnable() {
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        mainViewModel.generateDog();
+        mainViewModel.getDogImageMutableLiveData().observe(this, new Observer<DogImage>() {
             @Override
-            public void run() {
-                try {
-                    URL url = new URL(BASED_URL);
-                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                    InputStream inputStream = urlConnection.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                    StringBuilder data = new StringBuilder();
-                    String result;
-
-                    do {
-                        result = bufferedReader.readLine();
-                        if (result != null){
-                            data.append(result);
-                        }
-                    } while (result != null);
-
-                    Log.d("MainActivity", data.toString());
-                } catch (Exception e){
-                    Log.d("MainActivity", e.toString());
-                }
+            public void onChanged(DogImage dogImage) {
+                Log.d(LOG_TAG, dogImage.toString());
             }
-        }).start();
+        });
     }
 }
