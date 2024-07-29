@@ -26,13 +26,8 @@ import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainViewModel extends AndroidViewModel {
-    private static final String BASED_URL = "https://dog.ceo/api/breeds/image/random";
-    private static final String KEY_MESSAGE = "message";
-    private static final String KEY_STATUS = "status";
     private static final String LOG_TAG = "MainViewModel";
-
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     private MutableLiveData<DogImage> dogImageMutableLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<Boolean> internetError = new MutableLiveData<>();
@@ -79,7 +74,7 @@ public class MainViewModel extends AndroidViewModel {
                             @Override
                             public void accept(Throwable throwable) throws Throwable {
                                 internetError.setValue(true);
-                                Log.d(LOG_TAG, "Error" + throwable.getMessage());
+                                Log.d(LOG_TAG, "чзх" + throwable.getMessage());
                             }
                         }
                 );
@@ -87,32 +82,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     private Single<DogImage> loadDogImageRx() {
-        return Single.fromCallable(new Callable<DogImage>() {
-            @Override
-            public DogImage call() throws Exception {
-                URL url = new URL(BASED_URL);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-                StringBuilder data = new StringBuilder();
-                String result;
-
-                do {
-                    result = bufferedReader.readLine();
-                    if (result != null) {
-                        data.append(result);
-                    }
-                } while (result != null);
-
-                JSONObject jsonObject = new JSONObject(data.toString());
-                String message = jsonObject.getString(KEY_MESSAGE);
-                String status = jsonObject.getString(KEY_STATUS);
-                return new DogImage(message, status);
-            }
-        });
+        return ApiFactory.getApiService().loadDogImage();
     }
 
     @Override
