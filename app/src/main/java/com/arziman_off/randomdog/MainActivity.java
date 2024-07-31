@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "MainActivity";
     private MainViewModel mainViewModel;
-
     private ImageView mainImageView;
     private ProgressBar progressBar;
     private MaterialButton btnNewImageLoad;
